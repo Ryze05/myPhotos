@@ -13,13 +13,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
+import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +39,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.myphotos.ui.theme.MyPhotosTheme
 import coil.compose.rememberAsyncImagePainter
 
@@ -81,59 +88,14 @@ val photos = listOf(
     Data("Punta Cana", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Playa_Bavaro.JPG/2560px-Playa_Bavaro.JPG")
 )
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-/*fun Greeting(name: String, modifier: Modifier = Modifier) {
-
-    var fotoSeleccionada by remember { mutableStateOf<Int?>(null) }
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column() {
-            LazyRow(
-                contentPadding = PaddingValues(vertical = 20.dp, horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-
-                items(photos) { photo ->
-
-                    Image(
-                        painter = painterResource(id = photo),
-                        contentDescription = "User Image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(200.dp)
-                            .clickable { fotoSeleccionada = photo }
-
-                    )
-                }
-            }
-
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                if (fotoSeleccionada != null) {
-                    Image(
-                        painter = painterResource(id = fotoSeleccionada!!),
-                        contentDescription = "Foto",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(300.dp)
-                    )
-                } else {
-                    Text(
-                        text = "No hay imagen seleccionada",
-                    )
-                }
-            }
-        }
-    }
-}*/
-
 fun Greeting(name: String, modifier: Modifier = Modifier) {
 
     var fotoSeleccionada by remember { mutableStateOf<Data?>(null) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    /*Box(modifier = Modifier.fillMaxSize()) {
         Column {
             LazyRow(
                 contentPadding = PaddingValues(vertical = 20.dp, horizontal = 8.dp),
@@ -173,6 +135,52 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
                 }
             }
         }
+    }*/
+
+    HorizontalUncontainedCarousel(
+        state = rememberCarouselState { photos.count() },
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(top = 16.dp, bottom = 16.dp),
+        itemWidth = 186.dp,
+        itemSpacing = 8.dp,
+        contentPadding = PaddingValues(horizontal = 16.dp)
+    ) { i ->
+        val item = photos[i]
+        /*AsyncImage(
+            model = item,
+            contentDescription = item.name,
+            modifier = Modifier
+                .height(205.dp)
+                .maskClip(MaterialTheme.shapes.extraLarge)
+                .clickable { fotoSeleccionada = item },
+            contentScale = ContentScale.Crop
+        )*/
+
+        Image(
+            painter = rememberAsyncImagePainter(item.url),
+            contentDescription = item.name,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(200.dp)
+                .clickable { fotoSeleccionada = item }
+        )
+    }
+
+    if (fotoSeleccionada != null) {
+        Image(
+            painter = rememberAsyncImagePainter(fotoSeleccionada!!.url),
+            contentDescription = fotoSeleccionada!!.name,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(300.dp)
+        )
+        Text(text = fotoSeleccionada!!.name, modifier = Modifier.padding(top = 8.dp))
+    } else {
+        Text(
+            text = "No hay imagen seleccionada",
+        )
     }
 }
 
